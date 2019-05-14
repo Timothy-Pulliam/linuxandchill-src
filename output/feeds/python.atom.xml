@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>linuxandchill - Python</title><link href="http://linuxandchill.xyz/" rel="alternate"></link><link href="http://linuxandchill.xyz/feeds/python.atom.xml" rel="self"></link><id>http://linuxandchill.xyz/</id><updated>2010-12-05T19:30:00-05:00</updated><entry><title>Static Websites With Pelican</title><link href="http://linuxandchill.xyz/static-websites-with-pelican.html" rel="alternate"></link><published>2010-12-03T10:20:00-05:00</published><updated>2010-12-05T19:30:00-05:00</updated><author><name>Timothy Pulliam</name></author><id>tag:linuxandchill.xyz,2010-12-03:/static-websites-with-pelican.html</id><summary type="html">&lt;p&gt;Set up your own blog with Python and Pelican&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Python, Pelican, and Static Websites&lt;/h2&gt;
+&lt;p&gt;Static webpages are websites that use static assets. HTML, CSS and Javascript. If you are writing a humble blog, you don't need any fancy database backend stuff, or server end daemon thingys like that.&lt;/p&gt;
+&lt;p&gt;That's where &lt;a href="https://blog.getpelican.com/"&gt;Pelican&lt;/a&gt; comes in. It manages HTML/CSS for you so can stick to writing content.&lt;/p&gt;
+&lt;h2&gt;Installation&lt;/h2&gt;
+&lt;p&gt;If you are familiar with Python, you install Pelican the same way you install other Python packages, using PIP.&lt;/p&gt;
+&lt;p&gt;First, create a virtual environment&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cd ~/code/blog
+$ python3 -m venv venv
+$ . venv/bin/activate
+$ pip install -U pip
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Install the requisite packages&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ pip install pelican Markdown tzlocal typogrify
+$ pip freeze &amp;gt; requirements.txt
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Quickstart a pelican project with the following command&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ pelican-quickstart --title linuxandchill --author &amp;quot;Timothy Pulliam&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You will be prompted to answer the following questions&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt; Where do you want to create your new web site? [.]
+&amp;gt; What will be the title of this web site? [linuxandchill]
+&amp;gt; Who will be the author of this web site? [Timothy Pulliam]
+&amp;gt; What will be the default language of this web site? [en]
+&amp;gt; Do you want to specify a URL prefix? e.g., https://example.com   (Y/n)
+&amp;gt; What is your URL prefix? (see above example; no trailing slash) http://linuxandchill.xyz
+&amp;gt; Do you want to enable article pagination? (Y/n)
+&amp;gt; How many articles per page do you want? [10]
+&amp;gt; What is your time zone? [America/New_York]
+&amp;gt; Do you want to generate a tasks.py/Makefile to automate generation and publishing? (Y/n)
+&amp;gt; Do you want to upload your website using FTP? (y/N)
+&amp;gt; Do you want to upload your website using SSH? (y/N)
+&amp;gt; Do you want to upload your website using Dropbox? (y/N)
+&amp;gt; Do you want to upload your website using S3? (y/N)
+&amp;gt; Do you want to upload your website using Rackspace Cloud Files? (y/N)
+&amp;gt; Do you want to upload your website using GitHub Pages? (y/N) y
+&amp;gt; Is this your personal page (username.github.io)? (y/N) y
+Done. Your new project is available at /home/tpulliam/code/blog
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;After that, you should have a directory structure similar to the one below&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;blog/
+├── content
+│    ├──article.md
+|    ├── images/
+|         └── picture.png       
+|     
+├── output
+├── tasks.py
+├── Makefile
+├── pelicanconf.py       # Main settings file
+└── publishconf.py       # Settings to use when ready to publish
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Your articles will be written in markdown files. A minimum article.md will contain the following&lt;/p&gt;
+&lt;p&gt;Title: My super title
+Date: 2010-12-03 10:20
+Modified: 2010-12-05 19:30
+Category: Python
+Tags: pelican, publishing
+Slug: my-super-post
+Authors: Alexis Metaireau, Conan Doyle
+Summary: Short version for index and feeds&lt;/p&gt;
+&lt;p&gt;This is the content of my super blog post.&lt;/p&gt;
+&lt;p&gt;If you are going to include images in your articles (most likely), you can include them in a blog/content/images/ directory and reference them by adding the following line in pelicanconf.py&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;STATIC_PATHS = [&amp;#39;images&amp;#39;]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;When you write an article, you can include an image like this&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;![Alt text]({static}/images/picture.png)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Python Syntax Highlighting&lt;/h3&gt;
+&lt;p&gt;If you want to have your python code to be syntax highlighted like this&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;The triple-colon syntax will *not* show line numbers.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To display line numbers, use a path-less shebang instead of colons:&lt;/p&gt;
+&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;1&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;The path-less shebang syntax *will* show line numbers.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</content><category term="pelican"></category><category term="python"></category></entry></feed>

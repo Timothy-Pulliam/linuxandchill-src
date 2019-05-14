@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>linuxandchill - Users and Groups</title>
+        <link rel="stylesheet" href="http://linuxandchill.xyz/theme/css/main.css" />
+        <link href="http://linuxandchill.xyz/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="linuxandchill Atom Feed" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="http://linuxandchill.xyz/">linuxandchill </a></h1>
+                <nav><ul>
+                    <li><a href="http://linuxandchill.xyz/category/python.html">Python</a></li>
+                    <li><a href="http://linuxandchill.xyz/category/tutorials.html">Tutorials</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="http://linuxandchill.xyz/avoiding-gid-conflicts-when-creating-usersgroups-in-linux.html">Avoiding GID "conflicts" when Creating Users/Groups In Linux</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2018-04-23T01:38:00-04:00">
+                Published: Mon 23 April 2018
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="http://linuxandchill.xyz/author/timothy-pulliam.html">Timothy Pulliam</a>
+        </address>
+<p>In <a href="http://linuxandchill.xyz/category/tutorials.html">Tutorials</a>.</p>
+<p>tags: <a href="http://linuxandchill.xyz/tag/users-and-groups.html">Users and Groups</a> </p>
+</footer><!-- /.post-info --><p>Often times when you first install your OS the first thing you want to do is add some users and groups. So let's go ahead and do that.</p>
+<div class="highlight"><pre><span></span>  [root@localhost ~]# useradd daisy
+  [root@localhost ~]# groupadd cats
+  [root@localhost ~]# useradd sophie
+</pre></div>
+
+
+<p>But when we go to check on our newly created users we see that the "sophie" user has a UID of 1001, but a GID of 1002. This could complicate things unnecessarily. So how do we prevent this?</p>
+<div class="highlight"><pre><span></span>  [root@localhost ~]# tail -2 /etc/passwd
+  daisy:x:1000:1000::/home/daisy:/bin/bash
+  sophie:x:1001:1002::/home/sophie:/bin/bash
+</pre></div>
+
+
+<p>We can see that the reason sophie was forced to take a GID of 1002, is because we had given the newly created "cats" group a GID of 1001.</p>
+<div class="highlight"><pre><span></span>[root@localhost ~]# tail -3 /etc/group
+daisy:x:1000:
+cats:x:1001:
+sophie:x:1002:
+</pre></div>
+
+
+<p>An easy way to fix this is to designate a range of GIDs when creating groups (normally around 5000+) so they don't interfere with users in the 1000+ range. For example, what we could have done was the following.</p>
+<div class="highlight"><pre><span></span>  [root@localhost ~]# useradd daisy
+  [root@localhost ~]# groupadd -g 5000 cats
+  [root@localhost ~]# useradd sophie
+  [root@localhost ~]# tail -2 /etc/passwd
+  daisy:x:1000:1000::/home/daisy:/bin/bash
+  sophie:x:1001:1001::/home/sophie:/bin/bash
+</pre></div>
+
+
+<p>Now we can see that users GIDs will never interfere with GIDs of newly created groups. Furthermore we only need to pass the groupadd -g flag the first time. After that, groupadd will know to give groups a GID that comes after the one highest in the /etc/group file.</p>
+<div class="highlight"><pre><span></span>[root@localhost ~]# tail -5 /etc/group
+stapdev:x:158:
+tcpdump:x:72:
+daisy:x:1000:
+cats:x:5000:
+sophie:x:1001:
+[root@localhost ~]# groupadd people
+[root@localhost ~]# tail -5 /etc/group
+tcpdump:x:72:
+daisy:x:1000:
+cats:x:5000:
+sophie:x:1001:
+people:x:5001:
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://linuxandchill.xyz/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

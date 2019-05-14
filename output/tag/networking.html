@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>linuxandchill - Networking</title>
+        <link rel="stylesheet" href="http://linuxandchill.xyz/theme/css/main.css" />
+        <link href="http://linuxandchill.xyz/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="linuxandchill Atom Feed" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="http://linuxandchill.xyz/">linuxandchill </a></h1>
+                <nav><ul>
+                    <li><a href="http://linuxandchill.xyz/category/python.html">Python</a></li>
+                    <li><a href="http://linuxandchill.xyz/category/tutorials.html">Tutorials</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="http://linuxandchill.xyz/custom-firewalld-services.html">Custom Firewalld Services</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2018-05-08T19:05:00-04:00">
+                Published: Tue 08 May 2018
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="http://linuxandchill.xyz/author/timothy-pulliam.html">Timothy Pulliam</a>
+        </address>
+<p>In <a href="http://linuxandchill.xyz/category/tutorials.html">Tutorials</a>.</p>
+<p>tags: <a href="http://linuxandchill.xyz/tag/networking.html">Networking</a> <a href="http://linuxandchill.xyz/tag/firewall.html">Firewall</a> </p>
+</footer><!-- /.post-info --><h2>Overview</h2>
+<p>You can define custom services using firewall-cmd. Services are groups of firewall rules. For example, on a freeipa server, you would need to open the following ports.</p>
+<p>TCP Ports:</p>
+<ul>
+<li>80, 443: HTTP/HTTPS</li>
+<li>389, 636: LDAP/LDAPS</li>
+<li>88, 464: Kerberos</li>
+<li>53: DNS</li>
+</ul>
+<p>UDP Ports:</p>
+<ul>
+<li>88, 464: Kerberos</li>
+<li>53: DNS</li>
+<li>123: NTP</li>
+</ul>
+<p>You can group these all into a single service (named freeipa) and then simply start the one service, rather than start each individual rule. This allows you to logically group firewall rules so they are started and stopped together if necessary. It also avoids the inevitable confusion when you list out the ports on your firewall and see that port 88/UDP is open you may wonder why.</p>
+<h2>Creating New services</h2>
+<p>The following command creates a new file named <code>/etc/firewalld/services/freeipa.xml</code> as well as a new firewalld service named <code>freeipa</code>.</p>
+<div class="highlight"><pre><span></span>$ firewall-cmd --permanent --new-service=freeipa
+</pre></div>
+
+
+<p>You can add a more descriptive name as well as a short name for the service, plus the ports you wish to be associated with this service.</p>
+<div class="highlight"><pre><span></span>$ firewall-cmd --permanent --service=freeipa --set-description=&quot;Firewall rules for a FreeIPA Server&quot;
+$ firewall-cmd --permanent --service=freeipa --set-short=freeipa
+$ firewall-cmd --permanent --service=freeipa --add-port={80/tcp,443/tcp,389/tcp,636/tcp,88/tcp,464/tcp,53/tcp,88/udp,464/udp,53/udp,123/udp}
+</pre></div>
+
+
+<p>Now if you examine <code>/etc/firewalld/services/freeipa.xml</code> you will see it has been configured</p>
+<div class="highlight"><pre><span></span>$ cat /etc/firewalld/services/freeipa.xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;service&gt;
+  &lt;short&gt;freeipa&lt;/short&gt;
+  &lt;description&gt;Firewall rules for a FreeIPA Server&lt;/description&gt;
+  &lt;port protocol=&quot;tcp&quot; port=&quot;80&quot;/&gt;
+  &lt;port protocol=&quot;tcp&quot; port=&quot;443&quot;/&gt;
+  &lt;port protocol=&quot;tcp&quot; port=&quot;389&quot;/&gt;
+  &lt;port protocol=&quot;tcp&quot; port=&quot;636&quot;/&gt;
+  &lt;port protocol=&quot;tcp&quot; port=&quot;88&quot;/&gt;
+  &lt;port protocol=&quot;tcp&quot; port=&quot;464&quot;/&gt;
+  &lt;port protocol=&quot;tcp&quot; port=&quot;53&quot;/&gt;
+  &lt;port protocol=&quot;udp&quot; port=&quot;88&quot;/&gt;
+  &lt;port protocol=&quot;udp&quot; port=&quot;464&quot;/&gt;
+  &lt;port protocol=&quot;udp&quot; port=&quot;53&quot;/&gt;
+  &lt;port protocol=&quot;udp&quot; port=&quot;123&quot;/&gt;
+&lt;/service&gt;
+</pre></div>
+
+
+<p>Now, you can add this service just like any other service</p>
+<div class="highlight"><pre><span></span># firewall-cmd --permanent --add-service freeipa
+# firewall-cmd --reload
+# firewall-cmd --list-services
+ssh dhcpv6-client dns http freeipa
+</pre></div>
+
+
+<p>If you wish to permanently delete the service. You need to reload firewalld in order for effects to be recognized.</p>
+<div class="highlight"><pre><span></span># firewall-cmd --remove-service=freeipa
+# firewall-cmd --permanent --delete-service=freeipa
+success
+# firewall-cmd --reload
+</pre></div>
+
+
+<p>The *.xml config files are now deleted</p>
+<div class="highlight"><pre><span></span># pwd
+/etc/firewalld/services
+# ls
+freeipa.xml.old  test.xml.old
+</pre></div>
+
+
+<h4>Resources</h4>
+<p><a href="http://www.firewalld.org/documentation/howto/add-a-service.html">http://www.firewalld.org/documentation/howto/add-a-service.html</a></p>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://getpelican.com/">Pelican</a></li>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://linuxandchill.xyz/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
